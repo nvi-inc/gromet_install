@@ -1,0 +1,26 @@
+listen_address: 127.0.0.1:50001
+
+met:
+  address: met:10001  # or eg /dev/ttyS0
+  type: MET4A # or MET3 MET4
+
+wind:
+  address: met:10002
+
+alerts:
+  fs:
+    enabled: false
+#     path: /usr2/fs/bin
+#   # If one component is known to be bad and you don't want to get alerts about it,
+#   # uncomment the corresponding line below
+#   mask:
+#   #  - network
+#   #  - humidity
+#   #  - pressure
+#   #  - temperature
+#   #  - fan
+#   #  - wind
+#   email:
+#     enabled: true
+#     addresses:
+#       - oper

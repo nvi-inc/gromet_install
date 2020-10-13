@@ -1,0 +1,15 @@
+[Unit]
+Description=MET server for the Field System
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+ExecStart=/usr2/st/gromet/gromet
+Restart=always
+User=oper
+Group=rtx
+ProtectSystem=strict
+ProtectHome=yes
+
+[Install]
+WantedBy=multi-user.target

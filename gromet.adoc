@@ -1,0 +1,238 @@
+//
+// Copyright (c) 2020 NVI, Inc.
+//
+// This file is part of the FSL10 Linux distribution.
+// (see http://github.com/nvi-inc/fsl10).
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program. If not, see <http://www.gnu.org/licenses/>.
+//
+
+= DRAFT gromet installation for KPGO 12m FS computers
+E. Himwich, C. Frock, C. Coughlin
+Version 0.1 - October 2020
+
+:sectnums:
+:experimental:
+
+:toc:
+== Introduction
+
+This document lays out the steps for installing `gromet` (a met. data server)
+for the KPGO 12m Field System computers.  The resulting
+configuration will be the same as is used at MGO.  `Gromet` should
+be installed on both *fs1* and *fs2*. The one on *fs1* is the nominal
+operational installation. The one on *fs2* is there in case operations
+have to move to the *fs2* disks. It should be disabled on *fs2* until
+it is needed.
+
+The installation process uses the "Recoverable test" procedure of
+FSL10 to enable easy recovery in case of a problem. This has the
+advantage that if (i) steps are missing from the procedure or (ii)
+errors occur, and either or both can't be recovered from directly, it
+is relatively easy to return to the original state and start over.
+
+== Reverting the installation
+
+If it is not possible finish the installation before the next
+operational use of the system or disk rotation, the systems can be
+reverted to their previous configuration.  For each system
+that had the primary disk "dropped" follow the *failed* branch of
+the recoverable testing procedure at:
+
+https://nvi-inc.github.io/fsl10/raid.html#_recoverable_testing
+
+It will require several hours for the refresh operation
+to complete. The system can be used for operations, but not a disk
+rotation, while the refresh is in progress. Later, the installation
+can be tried again from scratch when it is convenient.
+
+Depending on where in the process the decision to revert the
+installation is made, it may also be necessary to move the MET4A and wind
+sensor serial connectors back to *fs1*.
+
+== fs1 installation
+
+All work in this section is to be performed on the KPGO 12m *fs1*
+computer.
+
+=== Preparing fs1
+
+. Follow the directions for the recoverable test procedure at:
+
++
+https://nvi-inc.github.io/fsl10/raid.html#_recoverable_testing
++
+[NOTE]
+====
+If the systems at KPGO have not had the *drop_primary* script
+installed yet, use the following command in its place:
+
+    mdadm /dev/md0 -f /dev/sda2
+====
+
+. Once the primary disk has been dropped from the RAID, move onto the
+next section.
+
+=== Setup the hardware:
+
+. Connect the Perle Ethernet converter to the correct Ethernet switch.
+
+. Configure the Perle Ethernet converter to have the correct IP address.
+
+. Configure the Perle Ethernet converter to have the correct Ethernet
+port numbers for the serial connectors for the MET4A and wind sensors,
+nominally 10001 and 10002 respectively.
+
+. Stop the met. services on fs1, as `root`:
+
+   systemctl stop metclient
+   systemctl stop metserver
+
+. Move the MET4A and wind sensor serial connections to the serial connectors on the Perle Ethernet converter.
+
+=== Installing gromet on fs1
+
+. Remove any previous installation of `gromet`.
+
+. As `root`, install or update the `go` language installation
++
+    cd ~/fsl10
+    ./fsadapt
++
+In `fsadapt`:
++
+.. On the first screen, make sure _only_ the `goinst` option is selected, then with `OK` highlighted,  press kbd:[Enter].
++
+.. On the second screen, use kbd:[Tab] to select `Cancel` then press kbd:[Enter].
+
+. As `prog`:
+
+.. Download and `make` gromet
++
+    cd /usr2/st
+    git clone https://github.com/nvi-inc/gromet.git
+    cd gromet
+    make
+
+.. Create the local configuration directory:
+
++
+    cd /usr2/st
+    mkdir gromet.conf
+
+.. Place the `README` file in the directory.
+
+.. Copy the default `gromet.service`, and `gromet.yml` files into the directory.
+
+    cd /usr2/st/gromet
+    cp gromet.service gromet.yml ../gromet.conf
+
+. As `oper`, if needed, change the `/usr2/control/gromet.yml` file to
+have the correct port numbers on the Perle converter if they are not 10001 for
+the MET4A and 10002 for the wind sensor.
++
+*If* `gromet.yml` was updated, then as `prog` copy it to the `/usr2/st/gromet.conf` directory:
++
+    cp /usr2/control/gromet.yml /usr2/st/gromet.conf
++
+If it is safe, answer `y` if prompted to confirm.
+
+. As `root`:
+
+.. Add `met` as an alias for the Perle Etherent converter to `/etc/hosts` if not already present.
+
+.. Install `gromet` as a service on *fs1*.
++
+    cd /usr2/st/gromet
+    make install
+
+.. Start the `gromet` service:
+
+    systemctl start gromet
+
+=== Testing gromet on fs1
+
+. Use the `wx` command in the FS to verify met data is still available.
+
+. Check in `grafana` on the MAS to verify that the met. data are updating.
+
+== fs2 installation
+
+Once *fs1* has been successfully set-up, the *fs2* disks, running in
+the spare computer, can be set-up.  Do not proceed with this step until
+`gromet` is working on *fs1*.
+
+=== Preparing fs2
+
+Follow the instructions in in the <<Preparing fs1>> section above, but this time doing them on *fs2*.
+
+=== Changes needed before installing gromet on fs2
+
+For this part of the installation it will be necessary to take some additional steps:
+
+. Terminate the FS on *fs1*.
+. Stop `gromet` on *fs1*, as `root`:
+
+    systemctl stop gromet
+
+=== Installing gromet on fs2
+
+Follow the directions in the <<Installing gromet on fs1>> section above, but this time performing the steps on *fs2*.
+
+=== Testing gromet on fs2
+
+. Use the `wx` command in the FS to verify met data is still available.
+
+== Finishing up
+
+The sections covers the steps to follow once `gromet` has been tested successfully on _both_ *fs1* and *fs2*
+
+=== Finalizing fs2
+
+. Terminate the FS on *fs2*.
+. Disable and stop `gromet` on *fs2*, as `root`:
+
+    systemctl disable gromet
+    systemctl stop gromet
+
+=== Finalizing fs1
+
+. Start `gromet` and metclient, and disable `metserver`  on *fs1*, as `root`:
+
+    systemctl start gromet
+    systemctl start metclient
+    systemctl disable metserver
+
+. Reverify the results of the <<Testing gromet on fs1>> section above.
+
+=== Restoring RAIDs
+
+If everything is still working, follow the *successful* steps in the recoverable test procedure, to recover the RAIDs on both *fs1* and *fs2*:
+
+https://nvi-inc.github.io/fsl10/raid.html#_recoverable_testing
+
+. Recover the RAID on *fs1*.
+
+. Recover the RAID on *fs2*.
+
+=== Remove go
+
+Unless you want to keep `go` installed, use the following command
+as `root` to remove `go` on both *fs1* and *fs2*:
+
+    rm -rf /usr/local/go
+
+. Remove `go` on *fs1*.
+
+. Remove `go` on *fs2*.
