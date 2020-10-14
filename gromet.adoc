@@ -20,7 +20,7 @@
 
 = DRAFT gromet installation for KPGO 12m FS computers
 E. Himwich, C. Frock, C. Coughlin
-Version 0.1 - October 2020
+Version 0.2 - October 2020
 
 :sectnums:
 :experimental:
@@ -41,6 +41,12 @@ FSL10 to enable easy recovery in case of a problem. This has the
 advantage that if (i) steps are missing from the procedure or (ii)
 errors occur, and either or both can't be recovered from directly, it
 is relatively easy to return to the original state and start over.
+
+== Combining with telegraf installation
+
+It is possible to combine the installation of `telegraf` with that of
+`gromet`. Please see the "Combining with gromet installation" section
+of the `telegraf` installation document for the details.
 
 == Reverting the installation
 
