@@ -20,10 +20,12 @@
 
 = DRAFT gromet installation for KPGO 12m FS computers
 E. Himwich, C. Frock, C. Coughlin
-Version 0.2 - October 2020
+Version 0.3 - October 2020
 
 :sectnums:
 :experimental:
+:downarrow: &downarrow;
+:uparrow: &uparrow;
 
 :toc:
 == Introduction
@@ -67,6 +69,93 @@ Depending on where in the process the decision to revert the
 installation is made, it may also be necessary to move the MET4A and wind
 sensor serial connectors back to *fs1*.
 
+== Setup the hardware
+
+=== Perle IOLAN SDS2 G Device Server
+
+. Configure to have the correct IP address and netmask.
+
+. Connect to the correct Ethernet switch.
+
+. Configure to have the correct setup for each serial device:
++
+Connect to the device with a Web Browser.
+
+.. DIP switch set to _serial_, it may need to be _console_ for first setup.
+
+.. For Serial #1:
+
+  General: TCP sockets, Port: 10001, multiple connections
+  Advanced: TCP keep alive
+  Hardware: EIA-232/485, 9600, 8, N, 1
+    for 232: full duplex
+    for 485: half/full duplex as needed; for half, enable echo suppression
+  Packet forwarding: Minimize Latency
+
+.. For serial #2, all the same except port 10002.
+
+.. Optionally set serial #1 device to met4a and #2 to wind
+
+=== Paroscientific MET4a met. sensor
+
+. If necessary, use a serial connection and a terminal emulator such as ????, to configure line protocol.
++
+Serial line configuration is 9600 BAUD, no parity, 8 data bits, and 1 stop bit, Use RS232 or RS485 as needed.
+
+. Connect MET4a to Perle serial port #1
+
+. Configure device, e.g. on Linux use `nc _ip_ 10002` to connect to the device at IP address `_ip_`.
+
+.. Set device to respond in _bars_ for pressure  with:
+
+ *0100EW*0100UN=2
+
+.. Test for response with:
+
+  *0100P9
++
+Example output:
+
+  $WIXDR,P,.885475,B,DQ146664,C,15.61,C,DQ20356187,H,100.00,P,DQ20356187
+
+=== Vaisala WMT70x wind sensor
+
+. If necessary, use a serial connection and a terminal emulator such as ????, to configure line protocol.
++
+Serial line configuration is 9600 BAUD, no parity, 8 data bits, and 1 stop bit, Use RS232 or RS485 as needed.
+
+. Connect WMT70x to Perle serial port #2
+
+. Configure device, e.g. on Linux use `nc _ip_ 10002` to connect to the device at IP address `_ip_`.
+
+.. Open command mode (can be entered as output is coming out):
+
+ $0OPEN
+
+.. Stop output with:
+
+  STOP
+
+.. Configure for WS425 A/B Standard Data Message auto-send:
+
+ S autoSend,19
+
+.. Speed in meters/second:
+
+ S wndUnit,0
+
+.. Output once per second:
+
+ S autoInt,1
+
+.. Start output:
+
+ START
++
+Output should start coming out once per second, e.g.:
+
+ $WIMWV,284,R,004.3,M,A*37
+
 == fs1 installation
 
 All work in this section is to be performed on the KPGO 12m *fs1*
@@ -90,23 +179,6 @@ installed yet, use the following command in its place:
 . Once the primary disk has been dropped from the RAID, move onto the
 next section.
 
-=== Setup the hardware:
-
-. Connect the Perle Ethernet converter to the correct Ethernet switch.
-
-. Configure the Perle Ethernet converter to have the correct IP address.
-
-. Configure the Perle Ethernet converter to have the correct Ethernet
-port numbers for the serial connectors for the MET4A and wind sensors,
-nominally 10001 and 10002 respectively.
-
-. Stop the met. services on fs1, as `root`:
-
-   systemctl stop metclient
-   systemctl stop metserver
-
-. Move the MET4A and wind sensor serial connections to the serial connectors on the Perle Ethernet converter.
-
 === Installing gromet on fs1
 
 . Remove any previous installation of `gromet`.
@@ -118,14 +190,36 @@ nominally 10001 and 10002 respectively.
 +
 In `fsadapt`:
 +
+
+NOTE: Use kbd:[Space] to toggle actions, `*` is selected, empty
+(space) is not selected. Use kbd:[{uparrow}] and kbd:[{downarrow}] to
+navigate between actions. Use kbd:[Tab] to change whether `<OK>` or `<Cancel>`
+is selected (inverse video) at the bottom.
+
++
 .. On the first screen, make sure _only_ the `goinst` option is selected, then with `OK` highlighted,  press kbd:[Enter].
 +
 .. On the second screen, use kbd:[Tab] to select `Cancel` then press kbd:[Enter].
 
 . As `prog`:
 
-.. Download and `make` gromet
+.. Set the `PATH` for _go_ in _~/.profile_
 +
+Make sure the lines:
+
+    export GOPATH=~/go
+    PATH="$GOPATH/bin:/usr/local/go/bin:$PATH"
++
+are uncommented.
+
+.. Reload the `PATH`:
++
+....
+. ~/.profile
+....
+
+.. Download and `make` gromet
+
     cd /usr2/st
     git clone https://github.com/nvi-inc/gromet.git
     cd gromet
@@ -144,24 +238,47 @@ In `fsadapt`:
     cd /usr2/st/gromet
     cp gromet.service gromet.yml ../gromet.conf
 
-. As `oper`, if needed, change the `/usr2/control/gromet.yml` file to
-have the correct port numbers on the Perle converter if they are not 10001 for
+. As `oper` setup _/usr2/control/gromet.yml_:
+
+.. Copy file to _/usr2/control_:
+
+  cd /usr2/control
+  cp /usr2/st/gromet.conf/gromet.yml .
+
+.. Change the _listen_address_ as needed. Typically, `127.0.0.1:50001` would be used.
+
+.. Change the _hostname_/IP (`address` before the ``:``_port_) for the devices
+to whatever is required. Usually an alias (perhaps _met_) in
+_/etc/hosts_ would be used.
+
+.. Change the port numbers to be correct for the Perle converter if they are not 10001 for
 the MET4A and 10002 for the wind sensor.
+
+. As _prog_:
 +
-*If* `gromet.yml` was updated, then as `prog` copy it to the `/usr2/st/gromet.conf` directory:
-+
+Copy the updated _gromet.yml_ back to the `/usr2/st/gromet.conf` directory:
+
     cp /usr2/control/gromet.yml /usr2/st/gromet.conf
 +
-If it is safe, answer `y` if prompted to confirm.
+If it is safe, answer `*y*` if prompted to confirm.
 
 . As `root`:
 
-.. Add `met` as an alias for the Perle Etherent converter to `/etc/hosts` if not already present.
+.. Add the alias (perhaps _met_) for the Perle Etherent converter to `/etc/hosts` if not already present.
+
+.. Stop the met. services on fs1, as `root`:
+
+   systemctl stop metclient
+   systemctl stop metserver
+
+.. Move the MET4A and wind sensor serial connections to the serial connectors on the Perle Ethernet converter.
 
 .. Install `gromet` as a service on *fs1*.
 +
     cd /usr2/st/gromet
     make install
++
+Answer `*n*` to not overwrite _gromet.yml_ if you have already configured as above.
 
 .. Start the `gromet` service:
 
