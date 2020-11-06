@@ -19,8 +19,8 @@
 //
 
 = DRAFT gromet installation for KPGO 12m FS computers
-E. Himwich, C. Frock, C. Coughlin
-Version 0.3 - October 2020
+E. Himwich, K.Imai, C. Frock, C. Coughlin
+Version 0.4 - November 2020
 
 :sectnums:
 :experimental:
@@ -73,15 +73,19 @@ sensor serial connectors back to *fs1*.
 
 === Perle IOLAN SDS2 G Device Server
 
+. Set DIP switch to _serial_. It may need to be _console_ for the first setup.
+
 . Configure to have the correct IP address and netmask.
++
+The Perle _Device Manager_ software can be used for this.
 
 . Connect to the correct Ethernet switch.
 
 . Configure to have the correct setup for each serial device:
 +
 Connect to the device with a Web Browser.
-
-.. DIP switch set to _serial_, it may need to be _console_ for first setup.
++
+NOTE: You could use the Perle _Device Manager_ instead.
 
 .. For Serial #1:
 
@@ -96,15 +100,19 @@ Connect to the device with a Web Browser.
 
 .. Optionally set serial #1 device to met4a and #2 to wind
 
+More information about this device can be found at: https://www.perle.com/products/iolan-sdg-device-server.shtml
+
 === Paroscientific MET4a met. sensor
 
-. If necessary, use a serial connection and a terminal emulator such as ????, to configure line protocol.
+. If necessary, use a serial connection and a terminal emulator such as _putty_, _screen_, or the Paroscientific utility _DQI3_, to configure the  line protocol.
 +
-Serial line configuration is 9600 BAUD, no parity, 8 data bits, and 1 stop bit, Use RS232 or RS485 as needed.
+The serial line configuration is 9600 BAUD, no parity, 8 data bits, and 1 stop bit, Use RS232 or RS485 as needed.
 
 . Connect MET4a to Perle serial port #1
 
-. Configure device, e.g. on Linux use `nc _ip_ 10002` to connect to the device at IP address `_ip_`.
+. Configure device, e.g. on Linux use `nc _ip_ 10001` to connect to the device at IP address `_ip_`.
++
+NOTE: You could use a serial connection and a terminal emulator instead.
 
 .. Set device to respond in _bars_ for pressure  with:
 
@@ -118,15 +126,20 @@ Example output:
 
   $WIXDR,P,.885475,B,DQ146664,C,15.61,C,DQ20356187,H,100.00,P,DQ20356187
 
+More information about this device can be found at:
+http://paroscientific.com/pdf/8008-001_Manual_for_MET4_and_MET4A_Meteorological_Measurement_Systems.pdf
+
 === Vaisala WMT70x wind sensor
 
-. If necessary, use a serial connection and a terminal emulator such as ????, to configure line protocol.
+. If necessary, use a serial connection and a terminal emulator such as _putty_, _screen_, or the Paroscientific utility _DQI3_, to configure the line protocol.
 +
-Serial line configuration is 9600 BAUD, no parity, 8 data bits, and 1 stop bit, Use RS232 or RS485 as needed.
+The serial line configuration is 9600 BAUD, no parity, 8 data bits, and 1 stop bit, Use RS232 or RS485 as needed.
 
 . Connect WMT70x to Perle serial port #2
 
 . Configure device, e.g. on Linux use `nc _ip_ 10002` to connect to the device at IP address `_ip_`.
++
+NOTE: You could use a serial connection and a terminal emulator instead.
 
 .. Open command mode (can be entered as output is coming out):
 
@@ -155,6 +168,9 @@ Serial line configuration is 9600 BAUD, no parity, 8 data bits, and 1 stop bit, 
 Output should start coming out once per second, e.g.:
 
  $WIMWV,284,R,004.3,M,A*37
+
+More information about this device can be found at:
+https://www.vaisala.com/sites/default/files/documents/WMT700%20User's%20Guide%20in%20English.pdf
 
 == fs1 installation
 
