@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2020 NVI, Inc.
+// Copyright (c) 2020-2021 NVI, Inc.
 //
 // This file is part of the FSL10 Linux distribution.
 // (see http://github.com/nvi-inc/fsl10).
@@ -18,9 +18,11 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 
-= DRAFT gromet installation for KPGO 12m FS computers
+:doctype: book
+
+= DRAFT gromet installation for FS computers
 E. Himwich, K.Imai, C. Frock, C. Coughlin
-Version 0.4 - November 2020
+Version 0.6 - August 2021
 
 :sectnums:
 :experimental:
@@ -28,46 +30,47 @@ Version 0.4 - November 2020
 :uparrow: &uparrow;
 
 :toc:
+
 == Introduction
 
-This document lays out the steps for installing `gromet` (a met. data server)
-for the KPGO 12m Field System computers.  The resulting
-configuration will be the same as is used at MGO.  `Gromet` should
-be installed on both *fs1* and *fs2*. The one on *fs1* is the nominal
-operational installation. The one on *fs2* is there in case operations
-have to move to the *fs2* disks. It should be disabled on *fs2* until
-it is needed.
+This document lays out the steps for installing _gromet_ (a met. data
+server) for Field System computers.  It assumes that there are both
+_operational_ and _spare_ computers in use. There are referred to as
+_fs1_ and _fs2_, respectively. You should of course replace those with
+the names of the computers you are using, if different. If there is
+only one computer, you can omit the steps involving _fs2_. _gromet_
+should be disabled on _fs2_ until it is needed.
 
-The installation process uses the "Recoverable test" procedure of
-FSL10 to enable easy recovery in case of a problem. This has the
-advantage that if (i) steps are missing from the procedure or (ii)
-errors occur, and either or both can't be recovered from directly, it
-is relatively easy to return to the original state and start over.
+The archive for _gromet_ can be found at:
+https://github.com/nvi-inc/gromet.
 
-== Combining with telegraf installation
-
-It is possible to combine the installation of `telegraf` with that of
-`gromet`. Please see the "Combining with gromet installation" section
-of the `telegraf` installation document for the details.
+The installation process uses the "`Recoverable testing`" procedure of
+FSL10 with a RAID to enable easy recovery in case of a problem. This
+has the advantage that if (i) steps are missing from the procedure or
+(ii) errors occur, and either or both can't be recovered from
+directly, it is relatively easy to return to the original state and
+start over. If you are using some other FSL__x__ or don't have a RAID,
+you should skip the use and restoration steps of the "`Recoverable
+testing`" procedure or substitute a different one.
 
 == Reverting the installation
 
 If it is not possible finish the installation before the next
 operational use of the system or disk rotation, the systems can be
-reverted to their previous configuration.  For each system
-that had the primary disk "dropped" follow the *failed* branch of
-the recoverable testing procedure at:
+reverted to their previous configuration.  For each system that had
+the primary disk "dropped" follow the _failed_ branch of the
+recoverable testing procedure at:
 
 https://nvi-inc.github.io/fsl10/raid.html#_recoverable_testing
 
-It will require several hours for the refresh operation
-to complete. The system can be used for operations, but not a disk
-rotation, while the refresh is in progress. Later, the installation
-can be tried again from scratch when it is convenient.
+It will require several hours for the refresh operation to complete.
+The system can be used for operations, but not a disk rotation, while
+the refresh is in progress. Later, the installation can be tried again
+from scratch when it is convenient.
 
 Depending on where in the process the decision to revert the
-installation is made, it may also be necessary to move the MET4A and wind
-sensor serial connectors back to *fs1*.
+installation is made, it may also be necessary to move the MET4A and
+wind sensor serial connectors back to _fs1_.
 
 == Setup the hardware
 
@@ -96,19 +99,21 @@ NOTE: You could use the Perle _Device Manager_ instead.
     for 485: half/full duplex as needed; for half, enable echo suppression
   Packet forwarding: Minimize Latency
 
-.. For serial #2, all the same except port 10002.
+.. For serial #2, use same setuo except use port `10002`.
 
 .. Optionally set serial #1 device to met4a and #2 to wind
 
-More information about this device can be found at: https://www.perle.com/products/iolan-sdg-device-server.shtml
+More information about this device can be found at:
 
-=== Paroscientific MET4a met. sensor
+https://www.perle.com/products/iolan-sdg-device-server.shtml
+
+=== Paroscientific MET4A met. sensor
 
 . If necessary, use a serial connection and a terminal emulator such as _putty_, _screen_, or the Paroscientific utility _DQI3_, to configure the  line protocol.
 +
 The serial line configuration is 9600 BAUD, no parity, 8 data bits, and 1 stop bit, Use RS232 or RS485 as needed.
 
-. Connect MET4a to Perle serial port #1
+. Connect MET4A to Perle serial port #1
 
 . Configure device, e.g. on Linux use `nc _ip_ 10001` to connect to the device at IP address `_ip_`.
 +
@@ -127,6 +132,7 @@ Example output:
   $WIXDR,P,.885475,B,DQ146664,C,15.61,C,DQ20356187,H,100.00,P,DQ20356187
 
 More information about this device can be found at:
+
 http://paroscientific.com/pdf/8008-001_Manual_for_MET4_and_MET4A_Meteorological_Measurement_Systems.pdf
 
 === Vaisala WMT70x wind sensor
@@ -135,7 +141,7 @@ http://paroscientific.com/pdf/8008-001_Manual_for_MET4_and_MET4A_Meteorological_
 +
 The serial line configuration is 9600 BAUD, no parity, 8 data bits, and 1 stop bit, Use RS232 or RS485 as needed.
 
-. Connect WMT70x to Perle serial port #2
+. Connect WMT70__x__ to Perle serial port #2
 
 . Configure device, e.g. on Linux use `nc _ip_ 10002` to connect to the device at IP address `_ip_`.
 +
@@ -170,27 +176,20 @@ Output should start coming out once per second, e.g.:
  $WIMWV,284,R,004.3,M,A*37
 
 More information about this device can be found at:
+
 https://www.vaisala.com/sites/default/files/documents/WMT700%20User's%20Guide%20in%20English.pdf
 
 == fs1 installation
 
-All work in this section is to be performed on the KPGO 12m *fs1*
-computer.
+All work in this section is to be performed on the _fs1_ computer.
 
 === Preparing fs1
 
 . Follow the directions for the recoverable test procedure at:
 
 +
-https://nvi-inc.github.io/fsl10/raid.html#_recoverable_testing
-+
-[NOTE]
-====
-If the systems at KPGO have not had the *drop_primary* script
-installed yet, use the following command in its place:
 
-    mdadm /dev/md0 -f /dev/sda2
-====
+https://nvi-inc.github.io/fsl10/raid.html#_recoverable_testing
 
 . Once the primary disk has been dropped from the RAID, move onto the
 next section.
@@ -199,28 +198,38 @@ next section.
 
 . Remove any previous installation of `gromet`.
 
-. As `root`, install or update the `go` language installation
-+
+. As _root_, install or update the _go_ language installation
+
+.. Run _fsadapt_:
+
     cd ~/fsl10
     ./fsadapt
+
 +
+
 In `fsadapt`:
+
 +
 
 NOTE: Use kbd:[Space] to toggle actions, `*` is selected, empty
 (space) is not selected. Use kbd:[{uparrow}] and kbd:[{downarrow}] to
-navigate between actions. Use kbd:[Tab] to change whether `<OK>` or `<Cancel>`
-is selected (inverse video) at the bottom.
+navigate between actions. Use kbd:[Tab] to change whether `<OK>` or
+`<Cancel>` is selected (inverse video) at the bottom.
 
 +
-.. On the first screen, make sure _only_ the `goinst` option is selected, then with `OK` highlighted,  press kbd:[Enter].
-+
-.. On the second screen, use kbd:[Tab] to select `Cancel` then press kbd:[Enter].
 
-. As `prog`:
+.. On the first screen, make sure _only_ the `goinst` option is
+selected, then with `OK` highlighted,  press kbd:[Enter].
+
+.. On the second screen, use kbd:[Tab] to select `Cancel` then press
+kbd:[Enter].
+
+. As _prog_:
 
 .. Set the `PATH` for _go_ in _~/.profile_
+
 +
+
 Make sure the lines:
 
     export GOPATH=~/go
@@ -247,131 +256,258 @@ are uncommented.
     cd /usr2/st
     mkdir gromet.conf
 
-.. Place the `README` file in the directory.
+.. Place the _README_ file in the directory. The contents are in the
+appendix <<Listing of README>>.
 
-.. Copy the default `gromet.service`, and `gromet.yml` files into the directory.
+.. Copy the default _gromet.service_, and _gromet.yml_ files into the
+directory. The contents are in the appendices
+<<Listing of gromet.service>> and <<Listing of gromet.yml>>,
+respectively.
 
     cd /usr2/st/gromet
     cp gromet.service gromet.yml ../gromet.conf
 
-. As `oper` setup _/usr2/control/gromet.yml_:
+. As _oper_ setup _/usr2/control/gromet.yml_:
 
 .. Copy file to _/usr2/control_:
 
   cd /usr2/control
   cp /usr2/st/gromet.conf/gromet.yml .
 
-.. Change the _listen_address_ as needed. Typically, `127.0.0.1:50001` would be used.
+.. Change the _listen_address_ as needed. Typically, `127.0.0.1:50001`
+would be used to serve met. data to the local host. To server data to
+the network, use the host alias for this machine from _/etc/hosts_ in place
+of `127.0.0.1`.
 
-.. Change the _hostname_/IP (`address` before the ``:``_port_) for the devices
-to whatever is required. Usually an alias (perhaps _met_) in
-_/etc/hosts_ would be used.
+.. Change the hostname/IP (in the `address` lines before the `:10001`
+and `:10002`) for the devices to whatever is required. Usually an
+alias (perhaps `met`) in _/etc/hosts_ would be used.
 
-.. Change the port numbers to be correct for the Perle converter if they are not 10001 for
-the MET4A and 10002 for the wind sensor.
+.. Change the port numbers to be correct for the Perle converter if
+they are not 10001 for the MET4A and 10002 for the wind sensor.
+
+.. If you have a MET3 or MET4 sensor, instead of a MET4A, adjust the
+`type` line accordingly.
 
 . As _prog_:
+
 +
-Copy the updated _gromet.yml_ back to the `/usr2/st/gromet.conf` directory:
+
+Copy the updated _gromet.yml_ back to the `/usr2/st/gromet.conf`
+directory:
 
     cp /usr2/control/gromet.yml /usr2/st/gromet.conf
+
 +
+
 If it is safe, answer `*y*` if prompted to confirm.
 
-. As `root`:
+. As _root_:
 
-.. Add the alias (perhaps _met_) for the Perle Etherent converter to `/etc/hosts` if not already present.
+.. Add the alias (perhaps `met`) for the Perle Etherent converter to _/etc/hosts_ if not already present.
 
-.. Stop the met. services on fs1, as `root`:
+.. If _metserver_ and _metclient_ were previously install, stop their services:
 
    systemctl stop metclient
    systemctl stop metserver
 
-.. Move the MET4A and wind sensor serial connections to the serial connectors on the Perle Ethernet converter.
+.. Move the MET4A and wind sensor serial connections to the serial
+connectors on the Perle Ethernet converter.
 
-.. Install `gromet` as a service on *fs1*.
-+
+.. Install _gromet_ as a service on this machine.
+
     cd /usr2/st/gromet
     make install
-+
-Answer `*n*` to not overwrite _gromet.yml_ if you have already configured as above.
 
-.. Start the `gromet` service:
++
+
+Answer `*n*` to not overwrite _gromet.yml_ if you have already configured it as above.
+
++
+
+.. Start the _gromet_ service:
 
     systemctl start gromet
 
-=== Testing gromet on fs1
+== Testing gromet on fs1
 
-. Use the `wx` command in the FS to verify met data is still available.
+. Use the `wx` command in the FS to verify met. data is still available.
 
-. Check in `grafana` on the MAS to verify that the met. data are updating.
+. Check in _grafana_ on the MAS to verify that the met. data are updating.
 
 == fs2 installation
 
-Once *fs1* has been successfully set-up, the *fs2* disks, running in
+Once _fs1_ has been successfully set-up, the _fs2_ disks, running in
 the spare computer, can be set-up.  Do not proceed with this step until
-`gromet` is working on *fs1*.
+_gromet_ is working on _fs1_.
 
 === Preparing fs2
 
-Follow the instructions in in the <<Preparing fs1>> section above, but this time doing them on *fs2*.
+Follow the instructions in the <<Preparing fs1>> sub-step above, but
+this time doing them on _fs2_. Then proceed with the next sub-step below
+<<Changes needed before installing gromet on fs2>>.
 
 === Changes needed before installing gromet on fs2
 
-For this part of the installation it will be necessary to take some additional steps:
+For this part of the installation it will be necessary to take some
+additional steps:
 
-. Terminate the FS on *fs1*.
-. Stop `gromet` on *fs1*, as `root`:
+. Terminate the FS on _fs1_.
+
+. Stop _gromet_ on _fs1_, as _root_:
 
     systemctl stop gromet
 
 === Installing gromet on fs2
 
-Follow the directions in the <<Installing gromet on fs1>> section above, but this time performing the steps on *fs2*.
+Follow the directions in the <<Installing gromet on fs1>> section
+above, but this time performing the steps on _fs2_. Then proceed to
+the next sub-step below <<Testing gromet on fs2>>.
 
-=== Testing gromet on fs2
+== Testing gromet on fs2
 
-. Use the `wx` command in the FS to verify met data is still available.
+Use the `wx` command in the FS to verify met. data is still available.
 
 == Finishing up
 
-The sections covers the steps to follow once `gromet` has been tested successfully on _both_ *fs1* and *fs2*
+The sections covers the steps to follow once _gromet_ has been tested
+successfully on _both_ _fs1_ and _fs2_
 
 === Finalizing fs2
 
-. Terminate the FS on *fs2*.
-. Disable and stop `gromet` on *fs2*, as `root`:
+. Terminate the FS on _fs2_.
+
+. Disable and stop _gromet_ on _fs2_, as _root_:
 
     systemctl disable gromet
     systemctl stop gromet
 
 === Finalizing fs1
 
-. Start `gromet` and metclient, and disable `metserver`  on *fs1*, as `root`:
+. Start _gromet_ (and if in use, _metclient_), and if it was in use, disable _metserver_
+on _fs1_, as _root_:
 
     systemctl start gromet
     systemctl start metclient
     systemctl disable metserver
 
++
+
+NOTE: Skip the _metserver_ command if it was not in use. Skip the
+_metclient_ command if it is not being used.
+
 . Reverify the results of the <<Testing gromet on fs1>> section above.
-
-=== Restoring RAIDs
-
-If everything is still working, follow the *successful* steps in the recoverable test procedure, to recover the RAIDs on both *fs1* and *fs2*:
-
-https://nvi-inc.github.io/fsl10/raid.html#_recoverable_testing
-
-. Recover the RAID on *fs1*.
-
-. Recover the RAID on *fs2*.
 
 === Remove go
 
-Unless you want to keep `go` installed, use the following command
-as `root` to remove `go` on both *fs1* and *fs2*:
+Unless you want to keep _go_ installed, use the following command
+as _root_ to remove _go_ on both _fs1_ and _fs2_:
 
     rm -rf /usr/local/go
 
-. Remove `go` on *fs1*.
+. Remove _go_ on _fs1_.
 
-. Remove `go` on *fs2*.
+. Remove _go_ on _fs2_.
+
+== Restoring RAIDs
+
+If everything is still working, follow the _successful_ steps in the
+recoverable test procedure, to recover the RAIDs on both _fs1_ and
+_fs2_:
+
+https://nvi-inc.github.io/fsl10/raid.html#_recoverable_testing
+
+. Recover the RAID on _fs1_.
+
+. Recover the RAID on _fs2_.
+
+[appendix]
+
+= Listing of README
+
+....
+Install
+
+  root:
+  install go with fsadapt
+
+  prog:
+    cd /usr2/st
+    git clone https://github.com/nvi-inc/gromet.git
+    cd gromet
+    make
+
+  root:
+    cd /usr2/st/gromet
+    make install
+
+   oper:
+   update /usr2/control/gromet.yml as needed,
+     recent copy in /usr2/st/gromet.conf
+
+  root:
+    systemctl start gromet
+
+on the spare machine:
+     systemctl disable gromet
+     systemctl stop gromet
+until needed, then:
+     systemctl enable gromet
+     systemctl start gromet
+(and disable/stop on other machine)
+....
+
+[appendix]
+
+= Listing of gromet.service
+
+....
+[Unit]
+Description=MET server for the Field System
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+ExecStart=/usr2/st/gromet/gromet
+Restart=always
+User=oper
+Group=rtx
+ProtectSystem=strict
+ProtectHome=yes
+
+[Install]
+WantedBy=multi-user.target
+....
+
+[appendix]
+
+= Listing of gromet.yml
+
+....
+listen_address: 127.0.0.1:50001
+
+met:
+  address: met:10001  # or eg /dev/ttyS0
+  type: MET4A # or MET3 MET4
+
+wind:
+  address: met:10002
+
+alerts:
+  fs:
+    enabled: false
+#     path: /usr2/fs/bin
+#   # If one component is known to be bad and you don't want to get alerts about it,
+#   # uncomment the corresponding line below
+#   mask:
+#   #  - network
+#   #  - humidity
+#   #  - pressure
+#   #  - temperature
+#   #  - fan
+#   #  - wind
+#   email:
+#     enabled: true
+#     addresses:
+#       - oper
+....
