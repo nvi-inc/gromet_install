@@ -22,7 +22,7 @@
 
 = DRAFT gromet installation for FS computers
 E. Himwich, K.Imai, C. Frock, C. Coughlin
-Version 0.6 - August 2021
+Version 0.7 - August 2021
 
 :sectnums:
 :experimental:
@@ -256,13 +256,12 @@ are uncommented.
     cd /usr2/st
     mkdir gromet.conf
 
-.. Place the _README_ file in the directory. The contents are in the
-appendix <<Listing of README>>.
+.. Place the _README_ file in the directory. A pointer to an example
+file and a listing of it are provided in the appendix
+<<README file>>.
 
 .. Copy the default _gromet.service_, and _gromet.yml_ files into the
-directory. The contents are in the appendices
-<<Listing of gromet.service>> and <<Listing of gromet.yml>>,
-respectively.
+directory.
 
     cd /usr2/st/gromet
     cp gromet.service gromet.yml ../gromet.conf
@@ -423,7 +422,11 @@ https://nvi-inc.github.io/fsl10/raid.html#_recoverable_testing
 
 [appendix]
 
-= Listing of README
+= README file
+
+An example can be found in the file _README_ at:
+https://github.com/nvi-inc/gromet_install. A listing is provided
+below.
 
 ....
 Install
@@ -455,59 +458,4 @@ until needed, then:
      systemctl enable gromet
      systemctl start gromet
 (and disable/stop on other machine)
-....
-
-[appendix]
-
-= Listing of gromet.service
-
-....
-[Unit]
-Description=MET server for the Field System
-After=network-online.target
-Wants=network-online.target
-
-[Service]
-ExecStart=/usr2/st/gromet/gromet
-Restart=always
-User=oper
-Group=rtx
-ProtectSystem=strict
-ProtectHome=yes
-
-[Install]
-WantedBy=multi-user.target
-....
-
-[appendix]
-
-= Listing of gromet.yml
-
-....
-listen_address: 127.0.0.1:50001
-
-met:
-  address: met:10001  # or eg /dev/ttyS0
-  type: MET4A # or MET3 MET4
-
-wind:
-  address: met:10002
-
-alerts:
-  fs:
-    enabled: false
-#     path: /usr2/fs/bin
-#   # If one component is known to be bad and you don't want to get alerts about it,
-#   # uncomment the corresponding line below
-#   mask:
-#   #  - network
-#   #  - humidity
-#   #  - pressure
-#   #  - temperature
-#   #  - fan
-#   #  - wind
-#   email:
-#     enabled: true
-#     addresses:
-#       - oper
 ....
