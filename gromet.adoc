@@ -22,7 +22,7 @@
 
 = DRAFT gromet installation for FS computers
 E. Himwich, K.Imai, C. Frock, C. Coughlin
-Version 0.7 - August 2021
+Version 0.8 - August 2021
 
 :sectnums:
 :experimental:
@@ -273,10 +273,13 @@ directory.
   cd /usr2/control
   cp /usr2/st/gromet.conf/gromet.yml .
 
-.. Change the _listen_address_ as needed. Typically, `127.0.0.1:50001`
-would be used to serve met. data to the local host. To server data to
-the network, use the host alias for this machine from _/etc/hosts_ in place
-of `127.0.0.1`.
+.. Change the `listen_address` as needed. Typically, `127.0.0.1:50001`
+would be used to serve met. data to the local host. All clients on the
+local host should use the same address to connect to _gromet_. To
+server data to the network, use the host alias for this machine from
+_/etc/hosts_ in place of `127.0.0.1`. In this case, all clients, on
+the local host or other hosts, should use an alias that resolves to
+this host's IP address.
 
 .. Change the hostname/IP (in the `address` lines before the `:10001`
 and `:10002`) for the devices to whatever is required. Usually an
