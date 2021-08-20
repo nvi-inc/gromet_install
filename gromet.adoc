@@ -22,7 +22,7 @@
 
 = DRAFT gromet installation for FS computers
 E. Himwich, K.Imai, C. Frock, C. Coughlin
-Version 0.8 - August 2021
+Version 0.9 - August 2021
 
 :sectnums:
 :experimental:
@@ -33,35 +33,35 @@ Version 0.8 - August 2021
 
 == Introduction
 
-This document lays out the steps for installing _gromet_ (a met. data
-server) for Field System computers.  It assumes that there are both
-_operational_ and _spare_ computers in use. There are referred to as
-_fs1_ and _fs2_, respectively. You should of course replace those with
-the names of the computers you are using, if different. If there is
-only one computer, you can omit the steps involving _fs2_. _gromet_
-should be disabled on _fs2_ until it is needed.
+This document provides instructions for installing _gromet_ (a met.
+data server) for Field System computers. It is assumed that there are
+both _operational_ and _spare_ computers in use. They are referred to
+as _fs1_ and _fs2_, respectively. You should of course replace those
+with the names of the computers you are using, if different. If there
+is only one computer, you can omit the actions involving _fs2_. If you
+do install on _fs2_, _gromet_ should be disabled there until it is
+needed.
 
-The archive for _gromet_ can be found at:
+The repository for _gromet_ can be found at
 https://github.com/nvi-inc/gromet.
 
-The installation process uses the "`Recoverable testing`" procedure of
+The installation process uses the _recoverable testing_ procedure of
 FSL10 with a RAID to enable easy recovery in case of a problem. This
-has the advantage that if (i) steps are missing from the procedure or
-(ii) errors occur, and either or both can't be recovered from
-directly, it is relatively easy to return to the original state and
-start over. If you are using some other FSL__x__ or don't have a RAID,
-you should skip the use and restoration steps of the "`Recoverable
-testing`" procedure or substitute a different one.
+has the advantage that if (i) actions are missing from the _gromet_
+installation procedure or (ii) errors occur, and either or both can't
+be recovered from directly, it is relatively easy to return to the
+original state and start over. If you are using some other FSL__x__ or
+don't have a RAID, you should skip using the recoverable testing
+procedure and recovery or substitute a different one.
 
 == Reverting the installation
 
 If it is not possible finish the installation before the next
 operational use of the system or disk rotation, the systems can be
-reverted to their previous configuration.  For each system that had
-the primary disk "dropped" follow the _failed_ branch of the
-recoverable testing procedure at:
-
-https://nvi-inc.github.io/fsl10/raid.html#_recoverable_testing
+reverted to their previous configuration. For each system that had the
+primary disk _dropped_ follow the _failed_ branch of the recoverable
+testing procedure at
+https://nvi-inc.github.io/fsl10/raid.html#_recoverable_testing.
 
 It will require several hours for the refresh operation to complete.
 The system can be used for operations, but not a disk rotation, while
@@ -103,37 +103,45 @@ NOTE: You could use the Perle _Device Manager_ instead.
 
 .. Optionally set serial #1 device to met4a and #2 to wind
 
-More information about this device can be found at:
-
-https://www.perle.com/products/iolan-sdg-device-server.shtml
+More information about this device can be found at
+https://www.perle.com/products/iolan-sdg-device-server.shtml.
 
 === Paroscientific MET4A met. sensor
 
-. If necessary, use a serial connection and a terminal emulator such as _putty_, _screen_, or the Paroscientific utility _DQI3_, to configure the  line protocol.
+. If necessary, use a serial connection and a terminal emulator such
+as _putty_, _screen_, or the Paroscientific utility _DQI3_, to
+configure the line protocol.
+
 +
-The serial line configuration is 9600 BAUD, no parity, 8 data bits, and 1 stop bit, Use RS232 or RS485 as needed.
+
+The serial line configuration is 9600 BAUD, no parity, 8 data bits,
+and 1 stop bit, Use RS232 or RS485 as needed.
 
 . Connect MET4A to Perle serial port #1
 
-. Configure device, e.g. on Linux use `nc _ip_ 10001` to connect to the device at IP address `_ip_`.
+. Configure device, e.g. on Linux use `nc _ip_ 10001` to connect to
+the device at IP address `_ip_`.
+
 +
+
 NOTE: You could use a serial connection and a terminal emulator instead.
 
-.. Set device to respond in _bars_ for pressure  with:
+.. Set device to respond in _bars_ for pressure with:
 
  *0100EW*0100UN=2
 
 .. Test for response with:
 
   *0100P9
+
 +
+
 Example output:
 
   $WIXDR,P,.885475,B,DQ146664,C,15.61,C,DQ20356187,H,100.00,P,DQ20356187
 
-More information about this device can be found at:
-
-http://paroscientific.com/pdf/8008-001_Manual_for_MET4_and_MET4A_Meteorological_Measurement_Systems.pdf
+More information about this device can be found at
+http://paroscientific.com/pdf/8008-001_Manual_for_MET4_and_MET4A_Meteorological_Measurement_Systems.pdf.
 
 === Vaisala WMT70x wind sensor
 
@@ -175,9 +183,8 @@ Output should start coming out once per second, e.g.:
 
  $WIMWV,284,R,004.3,M,A*37
 
-More information about this device can be found at:
-
-https://www.vaisala.com/sites/default/files/documents/WMT700%20User's%20Guide%20in%20English.pdf
+More information about this device can be found at
+https://www.vaisala.com/sites/default/files/documents/WMT700%20User's%20Guide%20in%20English.pdf.
 
 == fs1 installation
 
@@ -185,14 +192,11 @@ All work in this section is to be performed on the _fs1_ computer.
 
 === Preparing fs1
 
-. Follow the directions for the recoverable test procedure at:
-
-+
-
-https://nvi-inc.github.io/fsl10/raid.html#_recoverable_testing
+. Follow the directions for the recoverable test procedure at
+https://nvi-inc.github.io/fsl10/raid.html#_recoverable_testing.
 
 . Once the primary disk has been dropped from the RAID, move onto the
-next section.
+next step, <<Installing gromet on fs1>>, below.
 
 === Installing gromet on fs1
 
@@ -219,7 +223,7 @@ navigate between actions. Use kbd:[Tab] to change whether `<OK>` or
 +
 
 .. On the first screen, make sure _only_ the `goinst` option is
-selected, then with `OK` highlighted,  press kbd:[Enter].
+selected, then with `OK` highlighted, press kbd:[Enter].
 
 .. On the second screen, use kbd:[Tab] to select `Cancel` then press
 kbd:[Enter].
@@ -286,7 +290,7 @@ and `:10002`) for the devices to whatever is required. Usually an
 alias (perhaps `met`) in _/etc/hosts_ would be used.
 
 .. Change the port numbers to be correct for the Perle converter if
-they are not 10001 for the MET4A and 10002 for the wind sensor.
+they are not `10001` for the MET4A and `10002` for the wind sensor.
 
 .. If you have a MET3 or MET4 sensor, instead of a MET4A, adjust the
 `type` line accordingly.
@@ -340,19 +344,19 @@ Answer `*n*` to not overwrite _gromet.yml_ if you have already configured it as 
 == fs2 installation
 
 Once _fs1_ has been successfully set-up, the _fs2_ disks, running in
-the spare computer, can be set-up.  Do not proceed with this step until
-_gromet_ is working on _fs1_.
+the spare computer, can be set-up. Do not proceed with this section
+until _gromet_ is working on _fs1_.
 
 === Preparing fs2
 
-Follow the instructions in the <<Preparing fs1>> sub-step above, but
-this time doing them on _fs2_. Then proceed with the next sub-step below
+Follow the instructions in the <<Preparing fs1>> step above, but this
+time doing them on _fs2_. Then proceed with the next step below
 <<Changes needed before installing gromet on fs2>>.
 
 === Changes needed before installing gromet on fs2
 
 For this part of the installation it will be necessary to take some
-additional steps:
+additional actions:
 
 . Terminate the FS on _fs1_.
 
@@ -362,9 +366,9 @@ additional steps:
 
 === Installing gromet on fs2
 
-Follow the directions in the <<Installing gromet on fs1>> section
-above, but this time performing the steps on _fs2_. Then proceed to
-the next sub-step below <<Testing gromet on fs2>>.
+Follow the directions in the <<Installing gromet on fs1>> step
+above, but this time performing the actions on _fs2_. Then proceed to
+the next section below, <<Testing gromet on fs2>>.
 
 == Testing gromet on fs2
 
@@ -372,8 +376,8 @@ Use the `wx` command in the FS to verify met. data is still available.
 
 == Finishing up
 
-The sections covers the steps to follow once _gromet_ has been tested
-successfully on _both_ _fs1_ and _fs2_
+This section covers the actions to follow once _gromet_ has been
+tested successfully on _both_ _fs1_ and _fs2_.
 
 === Finalizing fs2
 
@@ -413,11 +417,10 @@ as _root_ to remove _go_ on both _fs1_ and _fs2_:
 
 == Restoring RAIDs
 
-If everything is still working, follow the _successful_ steps in the
+If everything is still working, follow the _successful_ branch in the
 recoverable test procedure, to recover the RAIDs on both _fs1_ and
-_fs2_:
-
-https://nvi-inc.github.io/fsl10/raid.html#_recoverable_testing
+_fs2_ at
+https://nvi-inc.github.io/fsl10/raid.html#_recoverable_testing to:
 
 . Recover the RAID on _fs1_.
 
@@ -427,7 +430,7 @@ https://nvi-inc.github.io/fsl10/raid.html#_recoverable_testing
 
 = README file
 
-An example can be found in the file _README_ at:
+An example can be found in the file _README_ at
 https://github.com/nvi-inc/gromet_install. A listing is provided
 below.
 
