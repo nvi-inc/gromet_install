@@ -22,7 +22,7 @@
 
 = DRAFT gromet installation for FS computers
 E. Himwich, K.Imai, C. Frock, C. Coughlin
-Version 0.9 - August 2021
+Version 1.0 - August 2021
 
 :sectnums:
 :experimental:
@@ -285,9 +285,22 @@ _/etc/hosts_ in place of `127.0.0.1`. In this case, all clients, on
 the local host or other hosts, should use an alias that resolves to
 this host's IP address.
 
++
+
+NOTE: You may need to adjust any local host and internal site
+firewalls to allow devices to access _gromet_ if it is serving to the
+network.
+
 .. Change the hostname/IP (in the `address` lines before the `:10001`
 and `:10002`) for the devices to whatever is required. Usually an
 alias (perhaps `met`) in _/etc/hosts_ would be used.
+
++
+
++
+
+NOTE: You may need to adjust the internal site firewalls to allow
+_gromet_ to access to the Perle server (`met`).
 
 .. Change the port numbers to be correct for the Perle converter if
 they are not `10001` for the MET4A and `10002` for the wind sensor.
