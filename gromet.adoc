@@ -1,8 +1,8 @@
 //
-// Copyright (c) 2020-2021 NVI, Inc.
+// Copyright (c) 2020-2021, 2023 NVI, Inc.
 //
-// This file is part of the FSL10 Linux distribution.
-// (see http://github.com/nvi-inc/fsl10).
+// This file is part of the VLBI gromet_install distribution.
+// (see http://github.com/nvi-inc/gromet_install).
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
 
 = DRAFT gromet installation for FS computers
 E. Himwich, K.Imai, C. Frock, C. Coughlin
-Version 1.0 - August 2021
+Version 1.1 - August 2023
 
 :sectnums:
 :experimental:
@@ -30,6 +30,12 @@ Version 1.0 - August 2021
 :uparrow: &uparrow;
 
 :toc:
+
+== Revision history
+
+* 1.1 -- August 2023 -- Correct MET4 bar command to `3`
+
+* 1.0 -- August 2021 -- Initial version
 
 == Introduction
 
@@ -128,7 +134,7 @@ NOTE: You could use a serial connection and a terminal emulator instead.
 
 .. Set device to respond in _bars_ for pressure with:
 
- *0100EW*0100UN=2
+ *0100EW*0100UN=3
 
 .. Test for response with:
 
