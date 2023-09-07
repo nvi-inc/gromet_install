@@ -33,6 +33,8 @@ Version 1.2 - September 2023
 
 == Revision history
 
+* 1.2 -- Spetember 2023 -- Add TIP about using RS-232/485 converter
+
 * 1.1 -- August 2023 -- Correct MET4 bar command to `3`
 
 * 1.0 -- August 2021 -- Initial version
@@ -121,7 +123,7 @@ configure the line protocol.
 +
 
 The serial line configuration is 9600 BAUD, no parity, 8 data bits,
-and 1 stop bit, Use RS232 or RS485 as needed.
+and 1 stop bit. Use RS232 or RS485 as needed.
 
 . Connect MET4A to Perle serial port #1
 
@@ -153,7 +155,15 @@ http://paroscientific.com/pdf/8008-001_Manual_for_MET4_and_MET4A_Meteorological_
 
 . If necessary, use a serial connection and a terminal emulator such as _putty_, _screen_, or the Paroscientific utility _DQI3_, to configure the line protocol.
 +
-The serial line configuration is 9600 BAUD, no parity, 8 data bits, and 1 stop bit, Use RS232 or RS485 as needed.
+
+The serial line configuration is 9600 BAUD, no parity, 8 data bits,
+and 1 stop bit. Use RS232 or RS485 as needed.
+
++
+
+TIP: If your WMT70__x__ is wired for RS-485 and you are using a
+USB-to-RS-232 converter to configure it, you will need a RS-232/485
+converter.
 
 . Connect WMT70__x__ to Perle serial port #2
 
