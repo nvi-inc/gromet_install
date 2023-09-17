@@ -22,7 +22,7 @@
 
 = DRAFT gromet installation for FS computers
 E. Himwich, K.Imai, C. Frock, C. Coughlin
-Version 1.2 - September 2023
+Version 1.3 - September 2023
 
 :sectnums:
 :experimental:
@@ -33,7 +33,9 @@ Version 1.2 - September 2023
 
 == Revision history
 
-* 1.2 -- Spetember 2023 -- Add TIP about using RS-232/485 converter
+* 1.3 -- September 2023 -- Put _gromet_ in _/usr2/gromet_
+
+* 1.2 -- September 2023 -- Add TIP about using RS-232/485 converter
 
 * 1.1 -- August 2023 -- Correct MET4 bar command to `3`
 
@@ -244,9 +246,17 @@ selected, then with `OK` highlighted, press kbd:[Enter].
 .. On the second screen, use kbd:[Tab] to select `Cancel` then press
 kbd:[Enter].
 
+.. Download _gromet_
+
+    cd /usr2
+    git clone https://github.com/nvi-inc/gromet.git
+    chown -R prog.rtx gromet
+
 . As _prog_:
 
 .. Set the `PATH` for _go_ in _~/.profile_
+
++
 
 +
 
@@ -255,6 +265,7 @@ Make sure the lines:
     export GOPATH=~/go
     PATH="$GOPATH/bin:/usr/local/go/bin:$PATH"
 +
+
 are uncommented.
 
 .. Reload the `PATH`:
@@ -263,35 +274,30 @@ are uncommented.
 . ~/.profile
 ....
 
-.. Download and `make` gromet
+.. `make` gromet
 
-    cd /usr2/st
-    git clone https://github.com/nvi-inc/gromet.git
-    cd gromet
+    cd /usr2/gromet
     make
 
-.. Create the local configuration directory:
+. As _root_:
 
-+
-    cd /usr2/st
-    mkdir gromet.conf
+.. Add the alias (perhaps `met`) for the Perle Etherent converter to _/etc/hosts_ if not already present.
 
-.. Place the _README_ file in the directory. A pointer to an example
-file and a listing of it are provided in the appendix
-<<README file>>.
+.. If _metserver_ and _metclient_ were previously install, stop their services:
 
-.. Copy the default _gromet.service_, and _gromet.yml_ files into the
-directory.
+   systemctl stop metclient
+   systemctl stop metserver
+
+.. Move the MET4A and wind sensor serial connections to the serial
+connectors on the Perle Ethernet converter.
+
+.. Install _gromet_ as a service on this machine.
 
     cd /usr2/st/gromet
-    cp gromet.service gromet.yml ../gromet.conf
+    git config --global --add safe.directory /usr2/gromet
+    make install
 
 . As _oper_ setup _/usr2/control/gromet.yml_:
-
-.. Copy file to _/usr2/control_:
-
-  cd /usr2/control
-  cp /usr2/st/gromet.conf/gromet.yml .
 
 .. Change the `listen_address` as needed. Typically, `127.0.0.1:50001`
 would be used to serve met. data to the local host. All clients on the
@@ -324,43 +330,11 @@ they are not `10001` for the MET4A and `10002` for the wind sensor.
 .. If you have a MET3 or MET4 sensor, instead of a MET4A, adjust the
 `type` line accordingly.
 
-. As _prog_:
-
-+
-
-Copy the updated _gromet.yml_ back to the `/usr2/st/gromet.conf`
-directory:
-
-    cp /usr2/control/gromet.yml /usr2/st/gromet.conf
-
-+
-
-If it is safe, answer `*y*` if prompted to confirm.
-
 . As _root_:
 
-.. Add the alias (perhaps `met`) for the Perle Etherent converter to _/etc/hosts_ if not already present.
-
-.. If _metserver_ and _metclient_ were previously install, stop their services:
-
-   systemctl stop metclient
-   systemctl stop metserver
-
-.. Move the MET4A and wind sensor serial connections to the serial
-connectors on the Perle Ethernet converter.
-
-.. Install _gromet_ as a service on this machine.
-
-    cd /usr2/st/gromet
-    make install
-
 +
 
-Answer `*n*` to not overwrite _gromet.yml_ if you have already configured it as above.
-
-+
-
-.. Start the _gromet_ service:
+Start the _gromet_ service:
 
     systemctl start gromet
 
@@ -439,6 +413,7 @@ Unless you want to keep _go_ installed, use the following command
 as _root_ to remove _go_ on both _fs1_ and _fs2_:
 
     rm -rf /usr/local/go
+    rm -rf /usr2/prog/go
 
 . Remove _go_ on _fs1_.
 
