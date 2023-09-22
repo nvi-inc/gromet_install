@@ -22,7 +22,7 @@
 
 = DRAFT gromet installation for FS computers
 E. Himwich, K.Imai, C. Frock, C. Coughlin
-Version 1.4 - September 2023
+Version 1.5 - September 2023
 
 :sectnums:
 :experimental:
@@ -32,6 +32,8 @@ Version 1.4 - September 2023
 :toc:
 
 == Revision history
+
+* 1.5 -- Wording improvements
 
 * 1.4 -- September 2023 -- Replace _README_ appendix with Changing the Active System
 
@@ -58,7 +60,7 @@ The repository for _gromet_ can be found at
 https://github.com/nvi-inc/gromet.
 
 The installation process uses the _recoverable testing_ procedure of
-FSL10 with a RAID to enable easy recovery in case of a problem. This
+FSL11 with a RAID to enable easy recovery in case of a problem. This
 has the advantage that if (i) actions are missing from the _gromet_
 installation procedure or (ii) errors occur, and either or both can't
 be recovered from directly, it is relatively easy to return to the
@@ -73,7 +75,7 @@ operational use of the system or disk rotation, the systems can be
 reverted to their previous configuration. For each system that had the
 primary disk _dropped_ follow the _failed_ branch of the recoverable
 testing procedure at
-https://nvi-inc.github.io/fsl10/raid.html#_recoverable_testing.
+https://nvi-inc.github.io/fsl11/raid.html#_recoverable_testing.
 
 It will require several hours for the refresh operation to complete.
 The system can be used for operations, but not a disk rotation, while
@@ -148,16 +150,30 @@ NOTE: You could use a serial connection and a terminal emulator instead.
 
 +
 
++
+
 Example output:
 
   $WIXDR,P,.885475,B,DQ146664,C,15.61,C,DQ20356187,H,100.00,P,DQ20356187
+
++
+
++
+
+NOTE: If no commands are being sent, either manually or by a program
+(e.g., _gromet_), the device will appear to be inactive (the activity
+lights for this device/port will not flash). Data is only sent when it
+is polled.
 
 More information about this device can be found at
 http://paroscientific.com/pdf/8008-001_Manual_for_MET4_and_MET4A_Meteorological_Measurement_Systems.pdf.
 
 === Vaisala WMT70x wind sensor
 
-. If necessary, use a serial connection and a terminal emulator such as _putty_, _screen_, or the Paroscientific utility _DQI3_, to configure the line protocol.
+. If necessary, use a serial connection and a terminal emulator such
+as _putty_, _screen_, or the Paroscientific utility _DQI3_, to
+configure the line protocol.
+
 +
 
 The serial line configuration is 9600 BAUD, no parity, 8 data bits,
@@ -183,7 +199,7 @@ NOTE: You could use a serial connection and a terminal emulator instead.
 
   STOP
 
-.. Configure for WS425 A/B Standard Data Message auto-send:
+.. Configure for WS425 A/B NMEA Standard Data Message auto-send:
 
  S autoSend,19
 
@@ -198,7 +214,20 @@ NOTE: You could use a serial connection and a terminal emulator instead.
 .. Start output:
 
  START
+
+.. Close command mode:
+
+ CLOSE
+
 +
+
+NOTE: If no command is entered for two minutes, command mode will close
+automatically.
+
++
+
++
+
 Output should start coming out once per second, e.g.:
 
  $WIMWV,284,R,004.3,M,A*37
@@ -213,7 +242,7 @@ All work in this section is to be performed on the _fs1_ computer.
 === Preparing fs1
 
 . Follow the directions for the recoverable test procedure at
-https://nvi-inc.github.io/fsl10/raid.html#_recoverable_testing.
+https://nvi-inc.github.io/fsl11/raid.html#_recoverable_testing.
 
 . Once the primary disk has been dropped from the RAID, move onto the
 next step, <<Installing gromet on fs1>>, below.
@@ -226,7 +255,7 @@ next step, <<Installing gromet on fs1>>, below.
 
 .. Run _fsadapt_:
 
-    cd ~/fsl10
+    cd ~/fsl11
     ./fsadapt
 
 +
@@ -283,9 +312,11 @@ are uncommented.
 
 . As _root_:
 
-.. Add the alias (perhaps `met`) for the Perle Etherent converter to _/etc/hosts_ if not already present.
+.. Add the alias (perhaps `met`) for the Perle Etherent converter to
+_/etc/hosts_ if not already present.
 
-.. If _metserver_ and _metclient_ were previously install, stop their services:
+.. If _metserver_ and _metclient_ were previously installed, stop
+their services:
 
    systemctl stop metclient
    systemctl stop metserver
@@ -299,7 +330,7 @@ connectors on the Perle Ethernet converter.
     git config --global --add safe.directory /usr2/gromet
     make install
 
-. As _oper_ setup _/usr2/control/gromet.yml_:
+. As _oper_ customize  _/usr2/control/gromet.yml_:
 
 .. Change the `listen_address` as needed. Typically, `127.0.0.1:50001`
 would be used to serve met. data to the local host. All clients on the
@@ -326,8 +357,8 @@ alias (perhaps `met`) in _/etc/hosts_ would be used.
 NOTE: You may need to adjust the internal site firewalls to allow
 _gromet_ to access to the Perle server (`met`).
 
-.. Change the port numbers to be correct for the Perle converter if
-they are not `10001` for the MET4A and `10002` for the wind sensor.
+.. Change the port numbers for the Perle converter if they are not
+`10001` for the MET4A and `10002` for the wind sensor.
 
 .. If you have a MET3 or MET4 sensor, instead of a MET4A, adjust the
 `type` line accordingly.
@@ -374,6 +405,14 @@ additional actions:
 Follow the directions in the <<Installing gromet on fs1>> step
 above, but this time performing the actions on _fs2_. Then proceed to
 the next section below, <<Testing gromet on fs2>>.
+
+NOTE: if the _/usr2_ partition on your _fs2_ system is periodically
+overwritten with _refresh_spare_usr2_, as it should be, all of the
+setup on _fs2_, except for the service, will be replaced with the
+setup on _fs1_. This is expected and should not cause a problem.
+
+NOTE: If you should need to switch operations to _fs2_, please see the
+appendix <<Changing the Active System for gromet>>.
 
 == Testing gromet on fs2
 
@@ -426,7 +465,7 @@ as _root_ to remove _go_ on both _fs1_ and _fs2_:
 If everything is still working, follow the _successful_ branch in the
 recoverable test procedure, to recover the RAIDs on both _fs1_ and
 _fs2_ at
-https://nvi-inc.github.io/fsl10/raid.html#_recoverable_testing to:
+https://nvi-inc.github.io/fsl11/raid.html#_recoverable_testing to:
 
 . Recover the RAID on _fs1_.
 
