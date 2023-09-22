@@ -22,7 +22,7 @@
 
 = DRAFT gromet installation for FS computers
 E. Himwich, K.Imai, C. Frock, C. Coughlin
-Version 1.3 - September 2023
+Version 1.4 - September 2023
 
 :sectnums:
 :experimental:
@@ -32,6 +32,8 @@ Version 1.3 - September 2023
 :toc:
 
 == Revision history
+
+* 1.4 -- September 2023 -- Replace _README_ appendix with Changing the Active System
 
 * 1.3 -- September 2023 -- Put _gromet_ in _/usr2/gromet_
 
@@ -431,41 +433,36 @@ https://nvi-inc.github.io/fsl10/raid.html#_recoverable_testing to:
 . Recover the RAID on _fs2_.
 
 [appendix]
+= Changing the Active System for gromet
 
-= README file
+If you have an operational (_fs1_) and a spare (_fs2_) system. You can
+switch which machine is running the _gromet_ service. Enter the
+commands below as _root_.
 
-An example can be found in the file _README_ at
-https://github.com/nvi-inc/gromet_install. A listing is provided
-below.
+CAUTION: _gromet_ should be only running one system at a time.
 
-....
-Install
+. On the machine where _gromet_ is running, disable it and stop it:
 
-  root:
-  install go with fsadapt
+ systemctl disable metclient
+ systemctl stop metclient
+ systemctl disable gromet
+ systemctl stop gromet
 
-  prog:
-    cd /usr2/st
-    git clone https://github.com/nvi-inc/gromet.git
-    cd gromet
-    make
++
 
-  root:
-    cd /usr2/st/gromet
-    make install
+NOTE: Skip the _metclient_ commands if it is not being used.
 
-   oper:
-   update /usr2/control/gromet.yml as needed,
-     recent copy in /usr2/st/gromet.conf
++
 
-  root:
-    systemctl start gromet
+NOTE: If this machine isn't available, enter these commands once it
+becomes available again.
 
-on the spare machine:
-     systemctl disable gromet
-     systemctl stop gromet
-until needed, then:
-     systemctl enable gromet
-     systemctl start gromet
-(and disable/stop on other machine)
-....
+. On the machine you want to run _gromet_ on, enable and start it:
+
+ systemctl enable gromet
+ systemctl start gromet
+ systemctl enable metclient
+ systemctl start metclient
++
+
+NOTE: Skip the _metclient_ commands if it is not being used.
