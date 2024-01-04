@@ -22,7 +22,7 @@
 
 = DRAFT gromet installation for FS computers
 E. Himwich, K.Imai, C. Frock, C. Coughlin
-Version 1.5 - September 2023
+Version 1.5.1 - January 2024
 
 :sectnums:
 :experimental:
@@ -32,6 +32,8 @@ Version 1.5 - September 2023
 :toc:
 
 == Revision history
+
+* 1.5.1 -- Remove errant `st/` in `cd ...` for `make install` step
 
 * 1.5 -- Wording improvements
 
@@ -326,7 +328,7 @@ connectors on the Perle Ethernet converter.
 
 .. Install _gromet_ as a service on this machine.
 
-    cd /usr2/st/gromet
+    cd /usr2/gromet
     git config --global --add safe.directory /usr2/gromet
     make install
 
